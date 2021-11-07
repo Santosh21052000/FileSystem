@@ -1,8 +1,21 @@
+#!/usr/bin/env node
+
+//global karne ke liye shebang syntax for node js(koi bhi chiz command line ke andar daaln ke liye matlab help, tree ko cmd prompt mein bhi run kar sakte hai)
+
+// we an run in commmand prompt
+//  peppy help
+//  peppy tree
+
+
 let ip=process.argv.slice(2);
 
 let fs= require("fs");
 
 let path= require("path");
+
+let helpObj = require("./components/help");
+let treeObj = require("./components/tree");
+let organizeObj = require("./components/organize");
 
 console.log(ip);
 
@@ -17,115 +30,23 @@ let types = {
 
 switch(command){
     case "tree":
-        treefn(ip[1]);
+        treeObj.treeKey(ip[1]);
         break;
     case "organize":
-        organizefn(ip[1]);
+        organizeObj.organizeKey(ip[1]);
         break;
         
     case "help":
-        helpfn();
+        helpObj.helpKey();
         break;        
     default:
         console.log("please input right command :)🙏");
         break;
 }
 
-function treefn(dirPath){
-    let destpath;
-    if(dirPath===undefined){
-        console.log("Kindly Enter The Path...");
-        return;
-    }else{
-      let doesexist =  fs.existsSync(dirPath);
-      if(doesexist){
-        tree_helper(dirPath);
-        
-      }else{
-        console.log("Kindly Enter The Correct Path...");
-        return;
-      }
-    }
-    
-}
-function tree_helper(dirpath){
-    
-}
 
 
-function organizefn(dirPath){
-    let destpath;
-    if(dirPath===undefined){
-        console.log("Kindly Enter The Path...");
-        return;
-    }else{
-      let doesexist =  fs.existsSync(dirPath);
-      if(doesexist){
-        destpath=  path.join(dirPath,"organized_files");
-        if(fs.existsSync(destpath)===false){
-            fs.mkdirSync(destpath);
-        }
-        
-      }else{
-        console.log("Kindly Enter The Correct Path...");
-        return;
-      }
-    }
-    organize_helper(dirPath,destpath);
-}
 
-function organize_helper(src,dest){
-   let childname= fs.readdirSync(src);
-//    console.log(childname);
-   for(let i=0;i<childname.length ; i++){
-     let childaddress =  path.join(src,childname[i]);
-    let isfile= fs.lstatSync(childaddress).isFile();
-    if(isfile){
-        // console.log(childname[i]);
-        let catagory=getCatagory(childname[i]);
-        // console.log(childname[i]," --> belong to catagory ", catagory)
-        sendFiles(childaddress,dest,catagory);
-
-    }
-   }
-
-}
-function sendFiles(srcfilePath,dest,catagory){
-    let catagorypath = path.join(dest,catagory);
-    if(fs.existsSync(catagorypath)===false){
-        fs.mkdirSync(catagorypath);
-    }
-    let filename=path.basename(srcfilePath);
-    let destfilepath=path.join(catagorypath,filename);
-    fs.copyFileSync(srcfilePath,destfilepath);
-    fs.unlinkSync(srcfilePath);
-    console.log(filename," copied to ",catagory);
-
-}
-
-function getCatagory(name){
-   let ext= path.extname(name);
-   //console.log(ext);
-   ext=ext.slice(1);
-   for(let type in types){
-       let ctypearr=types[type]; 
-       for(let i=0;i<ctypearr.length;i++){
-           if(ext===ctypearr[i]){
-               return type;
-           }
-       }
-   }
-   return "others";
-}
-
-
-function helpfn(){
-    console.log(`list of all the command:
-                        node input.js tree "directoryPath"
-                        node input.js organize  "directoryPath"
-                        node input.js help
-    `);
-}
 
 
 
